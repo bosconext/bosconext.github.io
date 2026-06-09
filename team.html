@@ -48,7 +48,7 @@
       <span class="kicker">Staff</span>
       <h2 class="sec-title">スタッフ</h2>
     </div>
-    <div class="staff-grid reveal" id="staff"></div>
+    <div class="roster-grid reveal" id="staff"></div>
   </div>
 </section>
 
@@ -113,31 +113,32 @@ const PAGE = {
   ]
 };
 
-/* ===== 表示の仕組み ===== */
-document.getElementById("teamLead").innerHTML = PAGE.lead.map(function(p){return '<p>'+esc(p)+'</p>';}).join("");
-
-document.getElementById("teamData").innerHTML = PAGE.data.map(function(d){
-  return '<dt>'+esc(d.k)+'</dt><dd>'+esc(d.v)+'</dd>';
-}).join("");
-
-document.getElementById("roster").innerHTML = PAGE.players.map(function(p){
-  var num = p.no ? esc(p.no) : '⚽';
-  var top = p.photo ? '<img src="'+esc(p.photo)+'" alt="'+esc(p.name)+'">' : '<span class="player-no">'+num+'</span>';
-  var meta = [];
-  if(p.pos) meta.push(esc(p.pos));
-  if(p.no)  meta.push('No.'+esc(p.no));
-  var metaText = meta.length ? meta.join(' ・ ') : 'メンバー';
-  return '<div class="player-card"><div class="player-top">'+top+'</div>'+
-    '<div class="player-body"><span class="player-pos">'+metaText+'</span>'+
-    '<div class="player-name">'+esc(p.name)+'</div></div></div>';
-}).join("");
-
-document.getElementById("staff").innerHTML = PAGE.staff.map(function(s){
-  return '<div class="staff-card"><div class="staff-role">'+esc(s.role)+'</div>'+
-    '<div class="staff-name">'+esc(s.name)+'</div></div>';
-}).join("");
-
-observeReveals();
+/* ===== 表示の仕組み（内容は team.json＝CMSで編集。読めない時は上の PAGE を表示）===== */
+function renderTeam(d){
+  document.getElementById("teamLead").innerHTML = (d.lead||[]).map(function(p){return '<p>'+esc(p)+'</p>';}).join("");
+  document.getElementById("teamData").innerHTML = (d.data||[]).map(function(x){
+    return '<dt>'+esc(x.k)+'</dt><dd>'+esc(x.v)+'</dd>';
+  }).join("");
+  document.getElementById("roster").innerHTML = (d.players||[]).map(function(p){
+    var num = p.no ? esc(p.no) : '⚽';
+    var top = p.photo ? '<img src="'+esc(p.photo)+'" alt="'+esc(p.name)+'">' : '<span class="player-no">'+num+'</span>';
+    var meta = [];
+    if(p.pos) meta.push(esc(p.pos));
+    if(p.no)  meta.push('No.'+esc(p.no));
+    var metaText = meta.length ? meta.join(' ・ ') : 'メンバー';
+    return '<div class="player-card"><div class="player-top">'+top+'</div>'+
+      '<div class="player-body"><span class="player-pos">'+metaText+'</span>'+
+      '<div class="player-name">'+esc(p.name)+'</div></div></div>';
+  }).join("");
+  document.getElementById("staff").innerHTML = (d.staff||[]).map(function(s){
+    var top = s.photo ? '<img src="'+esc(s.photo)+'" alt="'+esc(s.name)+'">' : '<span class="player-no">★</span>';
+    return '<div class="player-card"><div class="player-top">'+top+'</div>'+
+      '<div class="player-body"><span class="player-pos">'+esc(s.role)+'</span>'+
+      '<div class="player-name">'+esc(s.name)+'</div></div></div>';
+  }).join("");
+  observeReveals();
+}
+loadJSON("team.json", function(d){ renderTeam(d || PAGE); });
 </script>
 </body>
 </html>

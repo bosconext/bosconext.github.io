@@ -48,7 +48,7 @@
       <span class="kicker">Staff</span>
       <h2 class="sec-title">スタッフ</h2>
     </div>
-    <div class="staff-grid reveal" id="staff"></div>
+    <div class="roster-grid reveal" id="staff"></div>
   </div>
 </section>
 
@@ -131,8 +131,10 @@ function renderTeam(d){
       '<div class="player-name">'+esc(p.name)+'</div></div></div>';
   }).join("");
   document.getElementById("staff").innerHTML = (d.staff||[]).map(function(s){
-    return '<div class="staff-card"><div class="staff-role">'+esc(s.role)+'</div>'+
-      '<div class="staff-name">'+esc(s.name)+'</div></div>';
+    var top = s.photo ? '<img src="'+esc(s.photo)+'" alt="'+esc(s.name)+'">' : '<span class="player-no">★</span>';
+    return '<div class="player-card"><div class="player-top">'+top+'</div>'+
+      '<div class="player-body"><span class="player-pos">'+esc(s.role)+'</span>'+
+      '<div class="player-name">'+esc(s.name)+'</div></div></div>';
   }).join("");
   observeReveals();
 }
