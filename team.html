@@ -20,7 +20,7 @@
     <div class="breadcrumb"><a href="index.html">ホーム</a> ／ チーム＆選手</div>
     <span class="kicker">Team &amp; Players</span>
     <h1>チーム＆選手プロフィール</h1>
-    <p>ピッチで闘うメンバーと、チームを支えるスタッフ、そしてチームのあゆみを紹介します。</p>
+    <p>ピッチで闘うメンバーと、チームを支えるスタッフ、そこでチームのあゆみを紹介します。</p>
   </div>
 </section>
 
@@ -72,7 +72,6 @@
    ★★★ このページの内容はここを編集します ★★★
    ・選手を追加 → players の { } をコピーして増やす（no・name）
    ・スタッフを追加 → staff の { } をコピーして増やす
-   ・写真を入れたいときは photo に画像URLを入れる（空 "" なら背番号を表示）
    ===================================================================== */
 const PAGE = {
   lead: [
@@ -80,7 +79,6 @@ const PAGE = {
     "2012年5月頃、デイケアのフットサルチーム「BOSCO」として活動を開始。2013年4月1日、デイケア卒業後も「フットサルをできる場をつくろう」という声から、BOSCO NEXTと改名して独立し、現在はチームで自主運営を行っています。"
   ],
 
-  /* チームデータ（ラベル：内容） */
   data: [
     {k:"発足日",     v:"2013年4月1日"},
     {k:"活動場所",   v:"大田区・目黒区・品川区・神奈川県 ほか"},
@@ -88,57 +86,93 @@ const PAGE = {
     {k:"ユニフォーム", v:"1st：レッド ／ 2nd：ブルー"}
   ],
 
-  /* 選手（背番号・ニックネーム）。背番号がない場合は no:"" でOK */
   players: [
-    {no:"2",  name:"まこ",      pos:"", photo:""},
+    {no:"2",  name:"まこ",      pos:"フィクソ", photo:""},
     {no:"5",  name:"だいき",    pos:"", photo:""},
-    {no:"7",  name:"あゆねえ",  pos:"", photo:""},
-    {no:"8",  name:"せいちゃん", pos:"", photo:""},
-    {no:"10", name:"ヒットミー", pos:"", photo:""},
-    {no:"14", name:"にっしー",  pos:"", photo:""},
-    {no:"18", name:"たっちゃん", pos:"", photo:""},
+    {no:"7",  name:"あゆねえ",  pos:"FP", photo:""},
+    {no:"8",  name:"せいちゃん", pos:"アラ", photo:""},
+    {no:"10", name:"ヒットミー", pos:"FP", photo:""},
+    {no:"14", name:"にっしー",  pos:"アラ/フィクソ", photo:""},
+    {no:"18", name:"たっちゃん", pos:"FP", photo:""},
     {no:"19", name:"ヒカル",    pos:"", photo:""},
-    {no:"23", name:"すがちゃん", pos:"", photo:""},
-    {no:"25", name:"マッキー",  pos:"", photo:""},
-    {no:"26", name:"とま",      pos:"", photo:""},
-    {no:"39", name:"おのっち",  pos:"", photo:""},
-    {no:"40", name:"あべちゃん", pos:"", photo:""},
-    {no:"",   name:"ハマさん",  pos:"", photo:""},
-    {no:"",   name:"うら",      pos:"", photo:""}
+    {no:"23", name:"すがちゃん", pos:"FP", photo:""},
+    {no:"25", name:"マッキー",  pos:"ゴレイロ/ピヴォ", photo:""},
+    {no:"26", name:"とま",      pos:"アラ", photo:""},
+    {no:"39", name:"おのっち",  pos:"FP", photo:""},
+    {no:"40", name:"あべちゃん", pos:"FP", photo:""},
+    {no:"",   name:"ハマさん",  pos:"ゴレイロ", photo:""},
+    {no:"",   name:"うら",      pos:"FP", photo:""}
   ],
 
-  /* スタッフ（役割・お名前） */
   staff: [
     {role:"監督", name:"アキさん"}
   ]
 };
 
-/* ===== 表示の仕組み（内容は team.json＝CMSで編集。読めない時は上の PAGE を表示）===== */
+/* ===== 表示の仕組み（標準のfetch方式にアップグレード） ===== */
 function renderTeam(d){
-  document.getElementById("teamLead").innerHTML = (d.lead||[]).map(function(p){return '<p>'+esc(p)+'</p>';}).join("");
-  document.getElementById("teamData").innerHTML = (d.data||[]).map(function(x){
-    return '<dt>'+esc(x.k)+'</dt><dd>'+esc(x.v)+'</dd>';
-  }).join("");
-  document.getElementById("roster").innerHTML = (d.players||[]).map(function(p){
-    var num = p.no ? esc(p.no) : '⚽';
-    var top = p.photo ? '<img src="'+esc(p.photo)+'" alt="'+esc(p.name)+'">' : '<span class="player-no">'+num+'</span>';
-    var meta = [];
-    if(p.pos) meta.push(esc(p.pos));
-    if(p.no)  meta.push('No.'+esc(p.no));
-    var metaText = meta.length ? meta.join(' ・ ') : 'メンバー';
-    return '<div class="player-card"><div class="player-top">'+top+'</div>'+
-      '<div class="player-body"><span class="player-pos">'+metaText+'</span>'+
-      '<div class="player-name">'+esc(p.name)+'</div></div></div>';
-  }).join("");
-  document.getElementById("staff").innerHTML = (d.staff||[]).map(function(s){
-    var top = s.photo ? '<img src="'+esc(s.photo)+'" alt="'+esc(s.name)+'">' : '<span class="player-no">★</span>';
-    return '<div class="player-card"><div class="player-top">'+top+'</div>'+
-      '<div class="player-body"><span class="player-pos">'+esc(s.role)+'</span>'+
-      '<div class="player-name">'+esc(s.name)+'</div></div></div>';
-  }).join("");
-  observeReveals();
+  if (!d) return;
+  
+  // 1. リード文
+  if(document.getElementById("teamLead")) {
+    document.getElementById("teamLead").innerHTML = (d.lead||[]).map(function(p){return '<p>'+esc(p)+'</p>';}).join("");
+  }
+  
+  // 2. チームデータ
+  if(document.getElementById("teamData")) {
+    document.getElementById("teamData").innerHTML = (d.data||[]).map(function(x){
+      return '<dt>'+esc(x.k)+'</dt><dd>'+esc(x.v)+'</dd>';
+    }).join("");
+  }
+  
+  // 3. 選手一覧
+  if(document.getElementById("roster")) {
+    document.getElementById("roster").innerHTML = (d.players||[]).map(function(p){
+      var num = p.no ? esc(p.no) : '⚽';
+      var top = p.photo ? '<img src="'+esc(p.photo)+'" alt="'+esc(p.name)+'">' : '<span class="player-no">'+num+'</span>';
+      var meta = [];
+      if(p.pos) meta.push(esc(p.pos));
+      if(p.no)  meta.push('No.'+esc(p.no));
+      var metaText = meta.length ? meta.join(' ・ ') : 'メンバー';
+      return '<div class="player-card"><div class="player-top">'+top+'</div>'+
+        '<div class="player-body"><span class="player-pos">'+metaText+'</span>'+
+        '<div class="player-name">'+esc(p.name)+'</div></div></div>';
+    }).join("");
+  }
+  
+  // 4. スタッフ一覧
+  if(document.getElementById("staff")) {
+    document.getElementById("staff").innerHTML = (d.staff||[]).map(function(s){
+      var top = s.photo ? '<img src="'+esc(s.photo)+'" alt="'+esc(s.name)+'">' : '<span class="player-no">★</span>';
+      return '<div class="player-card"><div class="player-top">'+top+'</div>'+
+        '<div class="player-body"><span class="player-pos">'+esc(s.role)+'</span>'+
+        '<div class="player-name">'+esc(s.name)+'</div></div></div>';
+    }).join("");
+  }
+  
+  // ふわっと出すアニメーションの実行（念のためエラー回避処理付き）
+  if(typeof observeReveals === "function") {
+    observeReveals();
+  }
 }
-loadJSON("team.json", function(d){ renderTeam(d || PAGE); });
+
+// team.json を確実に読み込む処理
+fetch("team.json")
+  .then(function(response) {
+    if (!response.ok) {
+      throw new Error("JSONファイルの読み込みに失敗しました。ステータス: " + response.status);
+    }
+    return response.json();
+  })
+  .then(function(data) {
+    // 読み込み成功：最新のjsonデータで画面を作る
+    renderTeam(data);
+  })
+  .catch(function(error) {
+    console.error("【確認用ログ】外付けJSONが読めなかったため、HTML内のデータで表示します:", error);
+    // 読み込み失敗：安全弁としてHTML内のPAGEデータで画面を作る
+    renderTeam(PAGE);
+  });
 </script>
 </body>
 </html>
