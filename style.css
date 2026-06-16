@@ -451,3 +451,21 @@ table.ltable{width:100%;border-collapse:collapse;min-width:520px}
 .kvlist dt{font-weight:700;color:var(--brand)}
 .kvlist dd{margin:0;color:var(--ink-soft)}
 @media(max-width:480px){ .kvlist{grid-template-columns:1fr;gap:2px 0} .kvlist dd{margin:0 0 10px} }
+
+/* スマホ（画面幅768px以下）のときだけ横スクロールにする */
+@media (max-width: 768px) {
+  .roster-grid {
+    display: flex !important;    /* 縦並びから横並びに変更 */
+    overflow-x: auto;            /* 横方向のはみ出しをスクロール許可 */
+    scroll-snap-type: x mandatory; /* スクロールしたときにカードの頭でピタッと止まる設定 */
+    -webkit-overflow-scrolling: touch; /* iPhoneでのスクロールを滑らかにする */
+    gap: 15px;                   /* カード同士の間隔 */
+    padding: 10px 5px;
+  }
+
+  /* 選手カード1枚あたりの横幅を調整 */
+  .roster-grid > * {
+    flex: 0 0 75%;               /* 画面幅の75%のサイズでカードを表示（次のカードがチラ見えする） */
+    scroll-snap-align: start;    /* ピタッと止まる位置を指定 */
+  }
+}
