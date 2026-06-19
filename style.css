@@ -243,7 +243,7 @@ section.block{padding:clamp(56px,8vw,96px) 0}
 .page-dir h4{font-weight:900;margin-bottom:16px;font-size:1.05rem}
 .page-dir ul{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px 24px}
 .page-dir li a{display:flex;align-items:center;gap:.5em;padding:.45em 0;font-weight:700;color:var(--ink);font-size:.92rem;border-bottom:1px solid var(--line)}
-.page-dir li a::before{content:"";color:var(--gold);font-weight:700}
+.page-dir li a::before{content:"›";color:var(--gold);font-weight:700}
 .page-dir li a:hover{color:var(--brand)}
 
 /* ---------- フッター ---------- */
@@ -327,44 +327,20 @@ footer{background:var(--dark-900);color:rgba(255,255,255,.8);padding:54px 0 30px
 .lead-block{max-width:72ch}
 .lead-block p{color:var(--ink-soft);font-size:1.02rem;margin-bottom:1em}
 
-/* 選手・スタッフ一覧（スマホでもきれいにグリッドが維持されるように調整） */
-.roster-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); /* スマホでも2列並びやすくコンパクトに一覧化 */
-  gap:16px;
-}
-@media(min-width:480px){
-  .roster-grid{
-    grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); /* パソコンやタブレットでは適正サイズに拡大 */
-    gap:20px;
-  }
-}
-
+/* 選手・スタッフ */
+.roster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px}
 .player-card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
   transition:transform .2s ease,box-shadow .2s ease;display:flex;flex-direction:column}
 .player-card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
 .player-top{position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden;
   background:radial-gradient(120% 120% at 70% 0%, rgba(212,32,42,.28), transparent 55%),linear-gradient(150deg,var(--dark-700),var(--dark-900))}
 .player-top img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.player-no{font-family:"Anton",sans-serif;font-size:clamp(2.8rem, 8vw, 4.4rem);color:var(--gold);line-height:1;text-shadow:0 4px 16px rgba(0,0,0,.45)}
-.player-body{padding:14px 16px}
-.player-pos{display:inline-block;font-size:.72rem;font-weight:700;color:var(--brand);background:rgba(212,32,42,.1);padding:.3em .7em;border-radius:999px;margin-bottom:6px}
-.player-name{font-weight:900;font-size:clamp(1rem, 3.5vw, 1.15rem);line-height:1.3}
-.player-kana{font-size:.74rem;color:var(--ink-soft)}
-
-/* 紹介文（.player-note）の縦スクロール設定 */
-.player-note{
-  font-size:.82rem;
-  color:var(--ink-soft);
-  margin-top:8px;
-  max-height: 90px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-.player-note::-webkit-scrollbar { width: 4px; }
-.player-note::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
-
-/* スタッフ */
+.player-no{font-family:"Anton",sans-serif;font-size:4.4rem;color:var(--gold);line-height:1;text-shadow:0 4px 16px rgba(0,0,0,.45)}
+.player-body{padding:16px 18px}
+.player-pos{display:inline-block;font-size:.72rem;font-weight:700;color:var(--brand);background:rgba(212,32,42,.1);padding:.3em .7em;border-radius:999px;margin-bottom:8px}
+.player-name{font-weight:900;font-size:1.15rem;line-height:1.3}
+.player-kana{font-size:.78rem;color:var(--ink-soft)}
+.player-note{font-size:.85rem;color:var(--ink-soft);margin-top:8px}
 .staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
 .staff-card{background:var(--paper-2);border:1px solid var(--line);border-left:5px solid var(--gold);border-radius:14px;padding:18px 20px}
 .staff-role{font-size:.74rem;font-weight:700;color:var(--gold-600);letter-spacing:.04em}
@@ -475,3 +451,24 @@ table.ltable{width:100%;border-collapse:collapse;min-width:520px}
 .kvlist dt{font-weight:700;color:var(--brand)}
 .kvlist dd{margin:0;color:var(--ink-soft)}
 @media(max-width:480px){ .kvlist{grid-template-columns:1fr;gap:2px 0} .kvlist dd{margin:0 0 10px} }
+
+/* === 選手カード：クリックで開くプロフィール === */
+.player-card{cursor:pointer;border:0;width:100%;text-align:inherit;font:inherit;background:var(--paper-2);padding:0}
+.player-card:hover{transform:translateY(-4px)}
+.player-card:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.pmodal{position:fixed;inset:0;background:rgba(16,13,11,.72);display:none;align-items:flex-start;justify-content:center;padding:5vh 16px;z-index:1000;overflow-y:auto}
+.pmodal.open{display:flex}
+.pmodal-panel{position:relative;background:var(--paper-2);border-radius:var(--radius);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.pmodal-close{position:absolute;top:10px;right:12px;width:38px;height:38px;border:0;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:22px;line-height:1;cursor:pointer;z-index:3}
+.pm-photo{width:100%;background:var(--dark-900);border-radius:var(--radius) var(--radius) 0 0;overflow:hidden}
+.pm-photo img{display:block;width:100%;max-height:62vh;object-fit:cover}
+.pm-head{display:flex;align-items:center;gap:14px;padding:18px 22px 4px}
+.pm-no{font-family:Anton,system-ui,sans-serif;font-size:2.6rem;color:var(--gold);line-height:1;flex:none}
+.pm-name{font-family:"Dela Gothic One",system-ui,sans-serif;font-size:1.3rem;line-height:1.2}
+.pm-pos{color:var(--ink-soft);font-weight:700;font-size:.9rem;margin-top:3px}
+.pm-meta{padding:2px 22px 0;color:var(--ink-soft);font-size:.9rem;margin:0}
+.pm-info{padding:16px 22px 26px;margin:0;display:grid;grid-template-columns:auto 1fr;gap:11px 16px}
+.pm-info dt{font-weight:700;color:var(--brand);font-size:.9rem}
+.pm-info dd{margin:0;color:var(--ink);font-size:.95rem;line-height:1.6}
+.pm-empty{padding:16px 22px 26px;color:var(--ink-soft)}
+@media(max-width:480px){ .pm-info{grid-template-columns:1fr;gap:3px 0} .pm-info dd{margin:0 0 10px} .pm-no{font-size:2.1rem} }
